@@ -216,7 +216,7 @@ jobs:
 
   Nightly-build:
     runs-on: ubuntu-latest
-    if: github.ref_name == 'master'
+    if: github.ref_name == 'no_memmove'
     needs: [Linux, MSYS2, MSVC]
     steps:
       - uses: actions/checkout@v3
