@@ -82,13 +82,12 @@ jobs:
             libtool
             make
             mingw-w64-${{ matrix.cross }}-toolchain
-            mingw-w64-${{ matrix.cross }}-libsamplerate
             mingw-w64-${{ matrix.cross }}-ntldd
             mingw-w64-${{ matrix.cross }}-SDL2
             mingw-w64-${{ matrix.cross }}-speexdsp
       - name: Build and related stuff, backup binaries
         run: |
-          # if [[ "${{ matrix.cross }}" != "i686" ]]; then pacman --noconfirm -S --needed mingw-w64-${{ matrix.cross }}-libsamplerate; fi
+          if [[ "${{ matrix.cross }}" != "i686" ]]; then pacman --noconfirm -S --needed mingw-w64-${{ matrix.cross }}-libsamplerate; fi
           git clone --depth 1 https://github.com/mupen64plus/mupen64plus-core.git ../mupen64plus-core
           ./../mupen64plus-core/.github/workflows/scripts/ci_build.sh ${{ matrix.arch }} ${{ matrix.cc }}
       - name: Backup dependencies, etc...
