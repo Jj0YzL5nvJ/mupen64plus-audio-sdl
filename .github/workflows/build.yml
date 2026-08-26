@@ -85,12 +85,18 @@ jobs:
             mingw-w64-${{ matrix.cross }}-ntldd
             mingw-w64-${{ matrix.cross }}-SDL2
       - name: Get and install special-case dependencies
-        if: matrix.cross != 'i686'
-        run: |
-          pacman --noconfirm --needed -S mingw-w64-${{ matrix.cross }}-libsamplerate mingw-w64-${{ matrix.cross }}-speexdsp
-      - name: Build and related stuff, backup binaries
         run: |
           git clone --depth 1 https://github.com/mupen64plus/mupen64plus-core.git ../mupen64plus-core
+          if [[ "${{ matrix.cross }}" != "i686" ]]; then
+            pacman --noconfirm --needed -S mingw-w64-${{ matrix.cross }}-libsamplerate mingw-w64-${{ matrix.cross }}-speexdsp
+          else
+            curl -L -O https://gist.githubusercontent.com/Jj0YzL5nvJ/f2575c352329ece1ff869cb6a66f2eca/raw/b9e8790817f7610e597b6e310d26db2b0da2f8a5/get_deprecated_msys2_mingw_deps.sh
+            chmod 755 get_deprecated_msys2_mingw_deps.sh
+            ./get_deprecated_msys2_mingw_deps.sh mingw32 mingw-w64-i686-libsamplerate-0.2.2-1-any.pkg.tar.zst 1398076 027a6f6b885d8c0d02fc3b16233b7cc5f508d6c17dfed3fa030c12f8746707d8
+            ./get_deprecated_msys2_mingw_deps.sh mingw32 mingw-w64-i686-speexdsp-1.2.1-1-any.pkg.tar.zst 487200 0562f4103ead06ddaf35ca312ca30967e4412a10f477ece9f45987b6c3f5556b
+          fi
+      - name: Build and related stuff, backup binaries
+        run: |
           ./../mupen64plus-core/.github/workflows/scripts/ci_build.sh ${{ matrix.arch }} ${{ matrix.cc }}
       - name: Backup dependencies, etc...
         run: |
@@ -139,7 +145,7 @@ jobs:
 
   Nightly-build:
     runs-on: ubuntu-latest
-    if: github.ref_name == 'master'
+    if: github.ref_name == 'ci-alter32'
     needs: [Linux, MSYS2, MSVC]
     steps:
       - uses: actions/checkout@v7
